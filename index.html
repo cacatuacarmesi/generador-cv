@@ -139,7 +139,7 @@
             document.getElementById('noExpMessage').classList.toggle('hidden', !isChecked);
         }
 
-        async function generateCV() {
+async function generateCV() {
             const key = apiKeyInput.value.trim();
             if(!key) return alert("Necesitas la API Key de Groq (Es gratis en console.groq.com)");
 
@@ -163,7 +163,7 @@
                 experience: document.getElementById('experience').value
             };
 
-            // Prompt diseñado para Llama 3 (JSON Mode)
+            // Prompt diseñado para Llama 3.3 (JSON Mode)
             const systemPrompt = `Eres un experto en CVs y ATS. Tu salida debe ser SIEMPRE un JSON válido, sin texto antes ni después.
             Estructura JSON requerida:
             {
@@ -195,13 +195,15 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        model: "llama3-70b-8192", // Modelo muy potente y gratis
+                        // --- CAMBIO IMPORTANTE AQUÍ ---
+                        model: "llama-3.3-70b-versatile", 
+                        // ------------------------------
                         messages: [
                             { role: "system", content: systemPrompt },
                             { role: "user", content: userPrompt }
                         ],
                         temperature: 0.5,
-                        response_format: { type: "json_object" } // Forzar JSON
+                        response_format: { type: "json_object" } 
                     })
                 });
 
