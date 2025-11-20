@@ -3,122 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador CV Gratuito con Gemini</title>
+    <title>Generador CV Inteligente</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Estilos para impresión perfecta (ATS Friendly) */
+        /* Estilos de impresión profesional */
         @media print {
             body * { visibility: hidden; }
             #cv-preview, #cv-preview * { visibility: visible; }
             #cv-preview { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; box-shadow: none; }
             .no-print { display: none !important; }
-            /* Asegura fondo blanco y texto negro */
-            .page-cv { background: white !important; color: black !important; }
+            .page-cv { padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; }
+            /* Forzar impresión de fondos (barras de progreso, etiquetas) */
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
-        .page-cv { max-width: 21cm; margin: 0 auto; min-height: 29.7cm; background: white; }
+        .page-cv { max-width: 21cm; min-height: 29.7cm; background: white; margin: 0 auto; color: #333; }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans">
+<body class="bg-slate-100 font-sans text-slate-800">
 
-    <!-- CONFIGURACIÓN API KEY (MODAL O HEADER) -->
-    <div class="bg-gray-900 text-white p-4 shadow-md sticky top-0 z-50 no-print">
-        <div class="max-w-4xl mx-auto flex justify-between items-center flex-wrap gap-2">
+    <!-- BARRA API KEY -->
+    <div class="bg-slate-900 text-white p-4 sticky top-0 z-50 no-print shadow-lg">
+        <div class="max-w-5xl mx-auto flex justify-between items-center flex-wrap gap-3">
             <div class="flex items-center gap-2">
-                <i class="fas fa-robot text-yellow-400"></i>
-                <h1 class="font-bold text-lg">CV Maker <span class="text-xs bg-yellow-500 text-black px-2 rounded">Gemini Free</span></h1>
+                <i class="fas fa-graduation-cap text-blue-400 text-xl"></i>
+                <span class="font-bold text-lg hidden sm:inline">CV Builder AI</span>
             </div>
-            <div class="flex gap-2 items-center w-full sm:w-auto">
-                <input type="password" id="apiKey" placeholder="Pega tu Google Gemini API Key aquí" class="text-black text-sm p-2 rounded w-full sm:w-64">
-                <button onclick="saveKey()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-bold">Guardar</button>
-                <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-xs underline text-gray-400 hover:text-white">¿Conseguir Key?</a>
+            <div class="flex gap-2 w-full sm:w-auto">
+                <input type="password" id="apiKey" placeholder="Pega tu NUEVA API Key aquí" class="text-black text-sm p-2 rounded w-full sm:w-64 border border-slate-600 focus:border-blue-500 outline-none">
+                <button onclick="saveKey()" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded text-sm font-bold transition">Guardar</button>
             </div>
         </div>
     </div>
 
-    <div class="max-w-4xl mx-auto p-4 sm:p-8">
+    <div class="max-w-5xl mx-auto p-4 md:p-8">
         
-        <!-- FORMULARIO DE DATOS -->
-        <div id="form-container" class="bg-white rounded-xl shadow-lg p-6 mb-8 no-print">
-            <h2 class="text-2xl font-bold mb-4 text-blue-600">Datos del Candidato</h2>
-            <p class="text-sm text-gray-500 mb-6">Tus datos no se envían a ningún servidor nuestro. Van directo de tu navegador a Google.</p>
+        <!-- FORMULARIO -->
+        <div id="form-container" class="bg-white rounded-xl shadow-xl p-6 md:p-10 mb-8 no-print border-t-4 border-blue-600">
+            <h1 class="text-3xl font-bold mb-2 text-slate-800">Genera tu CV Profesional</h1>
+            <p class="text-slate-500 mb-8">Rellena tus datos. Si no tienes experiencia, activa la casilla y la IA redactará una carta de motivación por ti.</p>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <input type="text" id="name" placeholder="Nombre Completo" class="border p-3 rounded w-full">
-                <input type="text" id="targetJob" placeholder="Puesto Objetivo (Ej: Auxiliar Administrativo)" class="border p-3 rounded w-full border-blue-300 bg-blue-50 font-semibold">
+            <!-- Datos Personales -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Nombre Completo</label>
+                    <input type="text" id="name" class="w-full border border-slate-300 p-3 rounded focus:ring-2 focus:ring-blue-200 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-blue-700 mb-1">Puesto al que aspiras</label>
+                    <input type="text" id="targetJob" placeholder="Ej: Auxiliar de Enfermería, Desarrollador Web..." class="w-full border border-blue-300 bg-blue-50 p-3 rounded font-semibold focus:ring-2 focus:ring-blue-200 outline-none">
+                </div>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <input type="email" id="email" placeholder="Email" class="border p-3 rounded w-full">
                 <input type="tel" id="phone" placeholder="Teléfono" class="border p-3 rounded w-full">
-                <input type="text" id="linkedin" placeholder="LinkedIn / Web" class="border p-3 rounded w-full">
+                <input type="text" id="linkedin" placeholder="LinkedIn / Portfolio (Opcional)" class="border p-3 rounded w-full">
             </div>
 
-            <div class="mb-4">
-                <label class="font-bold text-sm text-gray-600">Educación</label>
-                <textarea id="education" class="w-full border p-3 rounded h-20" placeholder="Ej: Grado Marketing, Universidad X, 2022"></textarea>
-            </div>
-
-            <div class="mb-6">
-                <label class="font-bold text-sm text-gray-600">Experiencia (Copia y pega tal cual, la IA lo arregla)</label>
-                <textarea id="experience" class="w-full border p-3 rounded h-40" placeholder="Trabajé en tienda X atendiendo clientes..."></textarea>
-            </div>
-
-            <button onclick="generateCV()" id="btn-generate" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg shadow-lg transition flex justify-center items-center gap-2">
-                <i class="fas fa-magic"></i> GENERAR CV CON IA
-            </button>
-            <p id="status-msg" class="text-center text-sm mt-2 text-gray-500 hidden">Conectando con Gemini...</p>
-        </div>
-
-        <!-- VISTA PREVIA DEL CV (OCULTA HASTA GENERAR) -->
-        <div id="cv-result" class="hidden">
-            <div class="flex justify-between items-center mb-4 no-print">
-                <h2 class="text-xl font-bold">Resultado:</h2>
-                <div class="flex gap-2">
-                    <button onclick="document.getElementById('form-container').style.display='block'; window.scrollTo(0,0);" class="bg-gray-500 text-white px-4 py-2 rounded">Editar Datos</button>
-                    <button onclick="window.print()" class="bg-blue-600 text-white px-4 py-2 rounded font-bold shadow"><i class="fas fa-file-pdf mr-2"></i>Descargar PDF</button>
+            <!-- Estudios y Certificados (SEPARADOS) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1"><i class="fas fa-university mr-1"></i> Educación Formal</label>
+                    <textarea id="education" class="w-full border p-3 rounded h-32 text-sm" placeholder="Ej: Grado en Derecho, Universidad Complutense, 2018-2022"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1"><i class="fas fa-certificate mr-1"></i> Cursos y Certificados</label>
+                    <textarea id="courses" class="w-full border p-3 rounded h-32 text-sm" placeholder="Ej: Curso de Excel Avanzado (40h), Udemy. Certificado de Inglés B2..."></textarea>
                 </div>
             </div>
 
-            <!-- HOJA DE PAPEL VIRTUAL -->
-            <div id="cv-preview" class="page-cv p-8 sm:p-12 shadow-2xl text-gray-800">
-                <!-- El contenido será inyectado aquí por JS -->
+            <!-- Experiencia con Lógica Toggle -->
+            <div class="mb-8 bg-slate-50 p-4 rounded border border-slate-200">
+                <div class="flex items-center justify-between mb-2">
+                    <label class="block text-sm font-bold text-slate-700"><i class="fas fa-briefcase mr-1"></i> Experiencia Laboral</label>
+                    <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-1 rounded border shadow-sm hover:bg-gray-50">
+                        <input type="checkbox" id="noExpCheckbox" onchange="toggleExperience()" class="w-4 h-4 text-blue-600">
+                        <span class="text-sm font-medium text-slate-600">No tengo experiencia laboral</span>
+                    </label>
+                </div>
+                
+                <textarea id="experience" class="w-full border p-3 rounded h-40 text-sm bg-white" placeholder="Pega aquí tus trabajos anteriores (puesto, empresa, fechas y tareas). La IA los ordenará."></textarea>
+                
+                <!-- Mensaje alternativo si no hay experiencia -->
+                <div id="noExpMessage" class="hidden p-4 text-blue-800 bg-blue-100 rounded text-sm mt-2">
+                    <i class="fas fa-info-circle mr-2"></i> Has indicado que no tienes experiencia. La IA ignorará el campo de arriba y generará una sección de <strong>"Motivación y Potencial"</strong> basada en tus estudios y habilidades.
+                </div>
+            </div>
+
+            <button onclick="generateCV()" id="btn-generate" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-4 rounded-lg shadow-lg transform transition active:scale-95 flex justify-center items-center gap-2">
+                <i class="fas fa-magic"></i> GENERAR CV OPTIMIZADO
+            </button>
+            <p id="status-msg" class="text-center text-sm mt-3 text-slate-500 hidden animate-pulse">Conectando con la IA de Google...</p>
+        </div>
+
+        <!-- RESULTADO -->
+        <div id="cv-result" class="hidden">
+            <div class="flex justify-between items-center mb-6 no-print bg-white p-4 rounded-lg shadow">
+                <span class="font-bold text-green-600"><i class="fas fa-check-circle"></i> CV Generado</span>
+                <div class="flex gap-3">
+                    <button onclick="editData()" class="text-slate-600 hover:text-black text-sm underline">Editar datos</button>
+                    <button onclick="window.print()" class="bg-slate-800 text-white px-5 py-2 rounded font-bold hover:bg-black transition"><i class="fas fa-download mr-2"></i>Descargar PDF</button>
+                </div>
+            </div>
+
+            <!-- PLANTILLA DEL CV (DISEÑO LIMPIO) -->
+            <div id="cv-preview" class="page-cv p-8 md:p-16 shadow-2xl leading-relaxed">
+                <!-- Se rellena con JS -->
             </div>
         </div>
 
     </div>
 
-    <!-- LÓGICA JAVASCRIPT -->
     <script>
-        // 1. GESTIÓN DE API KEY
+        // --- LÓGICA PRINCIPAL ---
+
+        // 1. Gestión API Key
         const apiKeyInput = document.getElementById('apiKey');
-        
-        // Cargar key guardada al iniciar
         window.onload = () => {
             const savedKey = localStorage.getItem('gemini_api_key');
             if(savedKey) apiKeyInput.value = savedKey;
         }
-
         function saveKey() {
             const key = apiKeyInput.value.trim();
-            if(!key) return alert("Por favor escribe una API Key");
+            if(!key) return alert("Escribe una API Key válida");
             localStorage.setItem('gemini_api_key', key);
-            alert("API Key guardada en tu navegador.");
+            alert("Clave guardada correctamente.");
         }
 
-        // 2. LLAMADA A GEMINI
+        // 2. Toggle Experiencia
+        function toggleExperience() {
+            const checkbox = document.getElementById('noExpCheckbox');
+            const textarea = document.getElementById('experience');
+            const message = document.getElementById('noExpMessage');
+
+            if (checkbox.checked) {
+                textarea.classList.add('hidden');
+                message.classList.remove('hidden');
+            } else {
+                textarea.classList.remove('hidden');
+                message.classList.add('hidden');
+            }
+        }
+
+        function editData() {
+            document.getElementById('cv-result').classList.add('hidden');
+            document.getElementById('form-container').style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        // 3. Generación con IA
         async function generateCV() {
             const key = apiKeyInput.value.trim();
-            if(!key) return alert("Necesitas una API Key de Google (Es gratis). Pulsa en '¿Conseguir Key?' arriba.");
+            if(!key) return alert("Falta la API Key de Google. Configúrala arriba.");
 
-            // UI Loading
+            // UI
             const btn = document.getElementById('btn-generate');
             const status = document.getElementById('status-msg');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> REDACTANDO...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PENSANDO...';
             status.classList.remove('hidden');
 
-            // Recoger datos
+            // Datos
+            const noExperience = document.getElementById('noExpCheckbox').checked;
             const data = {
                 name: document.getElementById('name').value,
                 target: document.getElementById('targetJob').value,
@@ -126,121 +174,178 @@
                 phone: document.getElementById('phone').value,
                 linkedin: document.getElementById('linkedin').value,
                 education: document.getElementById('education').value,
+                courses: document.getElementById('courses').value,
                 experience: document.getElementById('experience').value
             };
 
-            // Prompt optimizado para JSON
-            const prompt = `
-                Actúa como un experto reclutador ATS.
-                Objetivo: Crear un CV para el puesto de "${data.target}".
-                
-                Instrucciones:
-                1. Analiza internamente qué keywords busca el mercado para "${data.target}" (skills técnicas y blandas).
-                2. Redacta un perfil profesional usando esas keywords.
-                3. Mejora la experiencia cruda del usuario convirtiéndola en logros medibles y verbos de acción.
-                4. Extrae skills.
-                
-                Datos usuario:
-                Nombre: ${data.name}
-                Experiencia cruda: ${data.experience}
-                Educación: ${data.education}
+            // Prompt condicional
+            let promptContext = "";
+            if (noExperience) {
+                promptContext = `
+                    EL CANDIDATO NO TIENE EXPERIENCIA LABORAL.
+                    En lugar de inventar experiencia, genera un campo llamado "motivation_text".
+                    Este texto debe ser un párrafo profesional y persuasivo (aprox 50-80 palabras) explicando por qué es el candidato ideal basándose en su formación, sus ganas de aprender y sus soft skills (responsabilidad, trabajo en equipo, rapidez).
+                    Deja el array "experience" vacío.
+                `;
+            } else {
+                promptContext = `
+                    EL CANDIDATO TIENE EXPERIENCIA.
+                    Mejora la redacción de la experiencia proporcionada: "${data.experience}".
+                    Convierte las descripciones en bullet points de logros y acciones.
+                    El campo "motivation_text" debe ir vacío o null.
+                `;
+            }
 
-                IMPORTANTE: Responde SOLAMENTE un objeto JSON válido (sin markdown, sin \`\`\`) con esta estructura:
+            const fullPrompt = `
+                Eres un experto redactor de CVs.
+                Objetivo: Crear un JSON para un CV de "${data.target}".
+                
+                ${promptContext}
+                
+                Datos del candidato:
+                - Nombre: ${data.name}
+                - Educación Formal: ${data.education}
+                - Cursos/Certificados: ${data.courses}
+                
+                INSTRUCCIONES DE FORMATO:
+                1. Analiza keywords del puesto "${data.target}" y úsalas en el "summary" y las "skills".
+                2. Separa claramente "education" (títulos oficiales) de "certificates" (cursos extra).
+                3. Devuelve SOLAMENTE un JSON válido con esta estructura:
                 {
-                    "summary": "Texto perfil...",
-                    "skills": ["skill1", "skill2", "skill3", "skill4", "skill5", "skill6"],
-                    "experience": [
-                        {"role": "Puesto", "company": "Empresa", "period": "Fechas (estimar si falta)", "bullets": ["logro 1", "logro 2"]}
-                    ],
-                    "education_formatted": "Texto educación formateado"
+                    "summary": "Perfil profesional corto (2-3 frases) enfocado al puesto.",
+                    "skills": ["skill1", "skill2", "skill3", "skill4", "skill5"],
+                    "education": [{"title": "Título", "institution": "Centro", "year": "Año"}],
+                    "certificates": [{"title": "Nombre Curso", "issuer": "Plataforma/Centro"}],
+                    "experience": [{"role": "Puesto", "company": "Empresa", "dates": "Fechas", "bullets": ["logro 1", "logro 2"]}],
+                    "motivation_text": "Texto de motivación si no hay experiencia, o null si la hay."
                 }
             `;
 
             try {
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${key}`, {
+                // Usamos gemini-1.5-flash estándar
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }]
+                        contents: [{ parts: [{ text: fullPrompt }] }]
                     })
                 });
 
+                if (!response.ok) throw new Error(`Error API: ${response.status}`);
                 const result = await response.json();
                 
-                if(result.error) throw new Error(result.error.message);
-
-                // Limpiar respuesta (Gemini a veces mete backticks)
                 let textRaw = result.candidates[0].content.parts[0].text;
+                // Limpieza agresiva de markdown json
                 textRaw = textRaw.replace(/```json/g, '').replace(/```/g, '').trim();
                 
-                const cvData = JSON.parse(textRaw);
-                renderCV(data, cvData);
+                const aiData = JSON.parse(textRaw);
+                renderCV(data, aiData, noExperience);
 
             } catch (error) {
                 console.error(error);
-                alert("Error: " + error.message + ". Verifica tu API Key.");
+                alert("Error: " + error.message + ". \n\nSi dice 'Not Found', verifica tu API Key o intenta regenerar una nueva en Google AI Studio.");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-magic"></i> GENERAR CV CON IA';
+                btn.innerHTML = '<i class="fas fa-magic"></i> GENERAR CV OPTIMIZADO';
                 status.classList.add('hidden');
             }
         }
 
-        // 3. RENDERIZAR EN HTML (PLANTILLA ATS SIMPLE)
-        function renderCV(userData, aiData) {
+        // 4. Renderizado
+        function renderCV(userData, aiData, isJunior) {
             const container = document.getElementById('cv-preview');
             
-            // Construir HTML
-            let skillsHtml = aiData.skills.map(s => `<span class="inline-block bg-gray-200 rounded px-2 py-1 text-xs font-semibold mr-1 mb-1">${s}</span>`).join('');
+            // HTML Componentes
+            const skillsHTML = aiData.skills.map(s => `<span class="bg-gray-200 px-2 py-1 rounded text-xs font-bold mr-2 mb-2 inline-block">${s}</span>`).join('');
             
-            let expHtml = aiData.experience.map(job => `
-                <div class="mb-4">
-                    <div class="flex justify-between items-baseline border-b border-gray-300 pb-1 mb-2">
-                        <h3 class="font-bold text-md uppercase">${job.role}</h3>
-                        <span class="text-sm font-semibold text-gray-600">${job.company} | ${job.period}</span>
+            const eduHTML = aiData.education.length > 0 ? aiData.education.map(e => `
+                <div class="mb-2">
+                    <div class="font-bold text-slate-800">${e.title}</div>
+                    <div class="text-sm text-slate-600">${e.institution} | ${e.year}</div>
+                </div>
+            `).join('') : '<p class="text-sm text-gray-400">Sin educación formal listada.</p>';
+
+            const certHTML = aiData.certificates && aiData.certificates.length > 0 ? `
+                <div class="mb-6">
+                    <h3 class="text-md font-bold uppercase border-b-2 border-slate-300 mb-3 text-slate-700 tracking-wider">Cursos y Certificaciones</h3>
+                    ${aiData.certificates.map(c => `<li class="text-sm mb-1 list-disc ml-4">${c.title} <span class="text-slate-500 text-xs">(${c.issuer})</span></li>`).join('')}
+                </div>
+            ` : '';
+
+            let mainSectionHTML = '';
+
+            if (isJunior && aiData.motivation_text) {
+                // Renderizar Motivación en lugar de Experiencia
+                mainSectionHTML = `
+                    <div class="mb-6">
+                        <h3 class="text-md font-bold uppercase border-b-2 border-slate-300 mb-3 text-slate-700 tracking-wider">Objetivo Profesional</h3>
+                        <div class="bg-slate-50 p-4 rounded border-l-4 border-blue-500 italic text-slate-700 text-sm leading-relaxed">
+                            "${aiData.motivation_text}"
+                        </div>
                     </div>
-                    <ul class="list-disc list-outside ml-5 text-sm space-y-1 text-gray-700">
-                        ${job.bullets.map(b => `<li>${b}</li>`).join('')}
-                    </ul>
-                </div>
-            `).join('');
+                `;
+            } else if (aiData.experience && aiData.experience.length > 0) {
+                // Renderizar Experiencia Normal
+                mainSectionHTML = `
+                    <div class="mb-6">
+                        <h3 class="text-md font-bold uppercase border-b-2 border-slate-300 mb-3 text-slate-700 tracking-wider">Experiencia Profesional</h3>
+                        ${aiData.experience.map(job => `
+                            <div class="mb-4">
+                                <div class="flex justify-between items-baseline">
+                                    <span class="font-bold text-slate-900">${job.role}</span>
+                                    <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded">${job.dates}</span>
+                                </div>
+                                <div class="text-sm text-blue-700 font-semibold mb-1">${job.company}</div>
+                                <ul class="list-disc ml-5 text-sm text-slate-700 space-y-1">
+                                    ${job.bullets.map(b => `<li>${b}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
 
+            // Montaje Final
             container.innerHTML = `
-                <div class="text-center border-b-2 border-gray-800 pb-4 mb-6">
-                    <h1 class="text-4xl font-bold uppercase tracking-wide mb-2">${userData.name}</h1>
-                    <p class="text-sm text-gray-600 space-x-2">
-                        <span>${userData.email}</span>
-                        ${userData.phone ? `<span>| ${userData.phone}</span>` : ''}
-                        ${userData.linkedin ? `<span>| ${userData.linkedin}</span>` : ''}
-                    </p>
-                    <p class="font-bold mt-2 text-lg">${userData.target}</p>
+                <!-- Header -->
+                <div class="text-center mb-8">
+                    <h1 class="text-4xl font-extrabold uppercase tracking-tight text-slate-900 mb-2">${userData.name}</h1>
+                    <p class="text-lg text-blue-700 font-medium mb-4 tracking-wide">${userData.target}</p>
+                    <div class="text-sm text-slate-600 flex justify-center gap-4 flex-wrap">
+                        <span><i class="fas fa-envelope text-slate-400"></i> ${userData.email}</span>
+                        <span><i class="fas fa-phone text-slate-400"></i> ${userData.phone}</span>
+                        ${userData.linkedin ? `<span><i class="fab fa-linkedin text-slate-400"></i> ${userData.linkedin}</span>` : ''}
+                    </div>
                 </div>
 
+                <!-- Perfil -->
                 <div class="mb-6">
-                    <h2 class="text-lg font-bold uppercase border-b-2 border-gray-300 mb-3">Perfil Profesional</h2>
-                    <p class="text-sm text-justify leading-relaxed">${aiData.summary}</p>
+                    <h3 class="text-md font-bold uppercase border-b-2 border-slate-300 mb-3 text-slate-700 tracking-wider">Perfil</h3>
+                    <p class="text-sm text-justify leading-relaxed text-slate-700">${aiData.summary}</p>
                 </div>
 
+                <!-- Skills -->
                 <div class="mb-6">
-                    <h2 class="text-lg font-bold uppercase border-b-2 border-gray-300 mb-3">Habilidades Clave (ATS Keywords)</h2>
-                    <div class="flex flex-wrap">${skillsHtml}</div>
+                    <h3 class="text-md font-bold uppercase border-b-2 border-slate-300 mb-3 text-slate-700 tracking-wider">Competencias Clave</h3>
+                    <div>${skillsHTML}</div>
                 </div>
 
-                <div class="mb-6">
-                    <h2 class="text-lg font-bold uppercase border-b-2 border-gray-300 mb-3">Experiencia Profesional</h2>
-                    ${expHtml}
-                </div>
+                <!-- Sección Variable (Experiencia o Motivación) -->
+                ${mainSectionHTML}
 
-                <div>
-                    <h2 class="text-lg font-bold uppercase border-b-2 border-gray-300 mb-3">Educación</h2>
-                    <p class="text-sm">${aiData.education_formatted}</p>
+                <!-- Educación y Cursos -->
+                <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
+                    <div>
+                        <h3 class="text-md font-bold uppercase border-b-2 border-slate-300 mb-3 text-slate-700 tracking-wider">Educación</h3>
+                        ${eduHTML}
+                    </div>
+                    ${certHTML}
                 </div>
             `;
 
-            // Mostrar resultado
             document.getElementById('cv-result').classList.remove('hidden');
-            document.getElementById('form-container').style.display = 'none'; // Ocultar form para ver mejor
-            window.scrollTo(0, document.body.scrollHeight);
+            document.getElementById('form-container').style.display = 'none';
+            window.scrollTo(0, 0);
         }
     </script>
 </body>
