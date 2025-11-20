@@ -3,36 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador CV Inteligente</title>
+    <title>CV Generator (Llama 3)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Estilos de impresión profesional */
         @media print {
             body * { visibility: hidden; }
             #cv-preview, #cv-preview * { visibility: visible; }
-            #cv-preview { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; box-shadow: none; }
+            #cv-preview { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
             .no-print { display: none !important; }
-            .page-cv { padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; }
-            /* Forzar impresión de fondos (barras de progreso, etiquetas) */
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
+            .page-cv { box-shadow: none !important; margin: 0 !important; width: 100% !important; }
         }
-        .page-cv { max-width: 21cm; min-height: 29.7cm; background: white; margin: 0 auto; color: #333; }
+        .page-cv { max-width: 21cm; min-height: 29.7cm; background: white; margin: 0 auto; color: #1f2937; }
+        /* Estilos para asegurar que los iconos se impriman */
+        i { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     </style>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800">
+<body class="bg-gray-100 font-sans text-gray-800">
 
-    <!-- BARRA API KEY -->
-    <div class="bg-slate-900 text-white p-4 sticky top-0 z-50 no-print shadow-lg">
+    <!-- HEADER CONFIGURACIÓN -->
+    <div class="bg-black text-white p-4 sticky top-0 z-50 no-print shadow-lg">
         <div class="max-w-5xl mx-auto flex justify-between items-center flex-wrap gap-3">
             <div class="flex items-center gap-2">
-                <i class="fas fa-graduation-cap text-blue-400 text-xl"></i>
-                <span class="font-bold text-lg hidden sm:inline">CV Builder AI</span>
+                <i class="fas fa-bolt text-orange-500 text-xl"></i>
+                <span class="font-bold text-lg">CV Speed AI <span class="text-xs bg-orange-600 px-2 py-0.5 rounded ml-2">Powered by Groq</span></span>
             </div>
             <div class="flex gap-2 w-full sm:w-auto">
-                <input type="password" id="apiKey" placeholder="Pega tu NUEVA API Key aquí" class="text-black text-sm p-2 rounded w-full sm:w-64 border border-slate-600 focus:border-blue-500 outline-none">
-                <button onclick="saveKey()" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded text-sm font-bold transition">Guardar</button>
+                <input type="password" id="apiKey" placeholder="Pega tu API Key de GROQ (gsk_...)" class="text-black text-sm p-2 rounded w-full sm:w-64 border-none focus:ring-2 focus:ring-orange-500 outline-none">
+                <button onclick="saveKey()" class="bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded text-sm font-bold transition">Guardar</button>
             </div>
         </div>
     </div>
@@ -40,133 +38,120 @@
     <div class="max-w-5xl mx-auto p-4 md:p-8">
         
         <!-- FORMULARIO -->
-        <div id="form-container" class="bg-white rounded-xl shadow-xl p-6 md:p-10 mb-8 no-print border-t-4 border-blue-600">
-            <h1 class="text-3xl font-bold mb-2 text-slate-800">Genera tu CV Profesional</h1>
-            <p class="text-slate-500 mb-8">Rellena tus datos. Si no tienes experiencia, activa la casilla y la IA redactará una carta de motivación por ti.</p>
+        <div id="form-container" class="bg-white rounded-xl shadow-xl p-6 md:p-10 mb-8 no-print border-t-4 border-orange-500">
+            <div class="mb-6 text-center">
+                <h1 class="text-3xl font-bold text-gray-900">Creador de Currículums</h1>
+                <p class="text-gray-500 text-sm mt-2">Rellena tus datos y la IA (Llama 3) redactará un perfil profesional perfecto.</p>
+            </div>
 
-            <!-- Datos Personales -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">Nombre Completo</label>
-                    <input type="text" id="name" class="w-full border border-slate-300 p-3 rounded focus:ring-2 focus:ring-blue-200 outline-none">
+                    <label class="label-text">Nombre Completo</label>
+                    <input type="text" id="name" class="input-field" placeholder="Juan Pérez">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-blue-700 mb-1">Puesto al que aspiras</label>
-                    <input type="text" id="targetJob" placeholder="Ej: Auxiliar de Enfermería, Desarrollador Web..." class="w-full border border-blue-300 bg-blue-50 p-3 rounded font-semibold focus:ring-2 focus:ring-blue-200 outline-none">
+                    <label class="label-text text-orange-700">Puesto Deseado</label>
+                    <input type="text" id="targetJob" class="input-field bg-orange-50 border-orange-300 font-semibold" placeholder="Ej: Mozo de Almacén, Administrativo...">
                 </div>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <input type="email" id="email" placeholder="Email" class="border p-3 rounded w-full">
-                <input type="tel" id="phone" placeholder="Teléfono" class="border p-3 rounded w-full">
-                <input type="text" id="linkedin" placeholder="LinkedIn / Portfolio (Opcional)" class="border p-3 rounded w-full">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
+                <div><label class="label-text">Email</label><input type="email" id="email" class="input-field"></div>
+                <div><label class="label-text">Teléfono</label><input type="tel" id="phone" class="input-field"></div>
+                <div><label class="label-text">LinkedIn/Web</label><input type="text" id="linkedin" class="input-field"></div>
             </div>
 
-            <!-- Estudios y Certificados (SEPARADOS) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1"><i class="fas fa-university mr-1"></i> Educación Formal</label>
-                    <textarea id="education" class="w-full border p-3 rounded h-32 text-sm" placeholder="Ej: Grado en Derecho, Universidad Complutense, 2018-2022"></textarea>
+                    <label class="label-text">Educación (Títulos Oficiales)</label>
+                    <textarea id="education" class="input-area h-24" placeholder="Grado, Centro, Año..."></textarea>
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1"><i class="fas fa-certificate mr-1"></i> Cursos y Certificados</label>
-                    <textarea id="courses" class="w-full border p-3 rounded h-32 text-sm" placeholder="Ej: Curso de Excel Avanzado (40h), Udemy. Certificado de Inglés B2..."></textarea>
+                    <label class="label-text">Cursos / Idiomas / Otros</label>
+                    <textarea id="courses" class="input-area h-24" placeholder="Curso Manipulador Alimentos, Inglés B2..."></textarea>
                 </div>
             </div>
 
-            <!-- Experiencia con Lógica Toggle -->
-            <div class="mb-8 bg-slate-50 p-4 rounded border border-slate-200">
-                <div class="flex items-center justify-between mb-2">
-                    <label class="block text-sm font-bold text-slate-700"><i class="fas fa-briefcase mr-1"></i> Experiencia Laboral</label>
-                    <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-1 rounded border shadow-sm hover:bg-gray-50">
-                        <input type="checkbox" id="noExpCheckbox" onchange="toggleExperience()" class="w-4 h-4 text-blue-600">
-                        <span class="text-sm font-medium text-slate-600">No tengo experiencia laboral</span>
+            <!-- Sección Experiencia con Toggle -->
+            <div class="mb-8 bg-gray-50 p-5 rounded-lg border border-gray-200">
+                <div class="flex justify-between items-center mb-3">
+                    <label class="label-text text-lg"><i class="fas fa-briefcase mr-2"></i>Experiencia</label>
+                    <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-1 rounded shadow-sm border">
+                        <input type="checkbox" id="noExpCheckbox" onchange="toggleExperience()" class="accent-orange-600 w-4 h-4">
+                        <span class="text-sm font-medium text-gray-600">No tengo experiencia</span>
                     </label>
                 </div>
                 
-                <textarea id="experience" class="w-full border p-3 rounded h-40 text-sm bg-white" placeholder="Pega aquí tus trabajos anteriores (puesto, empresa, fechas y tareas). La IA los ordenará."></textarea>
+                <textarea id="experience" class="input-area h-32 bg-white" placeholder="Pega aquí tus trabajos anteriores. No te preocupes por el formato."></textarea>
                 
-                <!-- Mensaje alternativo si no hay experiencia -->
-                <div id="noExpMessage" class="hidden p-4 text-blue-800 bg-blue-100 rounded text-sm mt-2">
-                    <i class="fas fa-info-circle mr-2"></i> Has indicado que no tienes experiencia. La IA ignorará el campo de arriba y generará una sección de <strong>"Motivación y Potencial"</strong> basada en tus estudios y habilidades.
+                <div id="noExpMessage" class="hidden p-4 bg-orange-100 text-orange-800 rounded text-sm border-l-4 border-orange-500">
+                    <i class="fas fa-lightbulb mr-2"></i> <strong>Modo Junior activado:</strong> La IA redactará una carta de presentación y resaltará tus habilidades transferibles.
                 </div>
             </div>
 
-            <button onclick="generateCV()" id="btn-generate" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-4 rounded-lg shadow-lg transform transition active:scale-95 flex justify-center items-center gap-2">
-                <i class="fas fa-magic"></i> GENERAR CV OPTIMIZADO
+            <button onclick="generateCV()" id="btn-generate" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-4 rounded-lg shadow-lg transform transition active:scale-95 flex justify-center items-center gap-2 text-lg">
+                <i class="fas fa-magic text-orange-500"></i> GENERAR CV
             </button>
-            <p id="status-msg" class="text-center text-sm mt-3 text-slate-500 hidden animate-pulse">Conectando con la IA de Google...</p>
+            <p id="status-msg" class="text-center text-sm mt-3 text-gray-500 hidden animate-pulse">Llama 3 está escribiendo tu CV...</p>
         </div>
 
         <!-- RESULTADO -->
         <div id="cv-result" class="hidden">
             <div class="flex justify-between items-center mb-6 no-print bg-white p-4 rounded-lg shadow">
-                <span class="font-bold text-green-600"><i class="fas fa-check-circle"></i> CV Generado</span>
-                <div class="flex gap-3">
-                    <button onclick="editData()" class="text-slate-600 hover:text-black text-sm underline">Editar datos</button>
-                    <button onclick="window.print()" class="bg-slate-800 text-white px-5 py-2 rounded font-bold hover:bg-black transition"><i class="fas fa-download mr-2"></i>Descargar PDF</button>
-                </div>
+                <button onclick="document.getElementById('form-container').style.display='block'; window.scrollTo(0,0);" class="text-gray-600 hover:text-black underline">Editar</button>
+                <button onclick="window.print()" class="bg-orange-600 text-white px-6 py-2 rounded font-bold hover:bg-orange-700 shadow-md"><i class="fas fa-file-pdf mr-2"></i>Descargar PDF</button>
             </div>
 
-            <!-- PLANTILLA DEL CV (DISEÑO LIMPIO) -->
-            <div id="cv-preview" class="page-cv p-8 md:p-16 shadow-2xl leading-relaxed">
-                <!-- Se rellena con JS -->
-            </div>
+            <!-- PAPEL -->
+            <div id="cv-preview" class="page-cv p-10 md:p-16 shadow-2xl"></div>
         </div>
 
     </div>
 
-    <script>
-        // --- LÓGICA PRINCIPAL ---
+    <!-- CLASES CSS CUSTOM -->
+    <style>
+        .label-text { display: block; font-size: 0.875rem; font-weight: 700; color: #374151; margin-bottom: 0.25rem; }
+        .input-field { width: 100%; border: 1px solid #d1d5db; padding: 0.75rem; border-radius: 0.5rem; outline: none; transition: 0.2s; }
+        .input-field:focus, .input-area:focus { border-color: #f97316; ring: 2px solid #ffedd5; }
+        .input-area { width: 100%; border: 1px solid #d1d5db; padding: 0.75rem; border-radius: 0.5rem; outline: none; resize: vertical; }
+    </style>
 
-        // 1. Gestión API Key
+    <!-- LÓGICA JS -->
+    <script>
         const apiKeyInput = document.getElementById('apiKey');
+
+        // Cargar key al inicio
         window.onload = () => {
-            const savedKey = localStorage.getItem('gemini_api_key');
+            const savedKey = localStorage.getItem('groq_api_key');
             if(savedKey) apiKeyInput.value = savedKey;
         }
+
         function saveKey() {
             const key = apiKeyInput.value.trim();
-            if(!key) return alert("Escribe una API Key válida");
-            localStorage.setItem('gemini_api_key', key);
-            alert("Clave guardada correctamente.");
+            if(!key.startsWith("gsk_")) return alert("La clave debe empezar por 'gsk_'");
+            localStorage.setItem('groq_api_key', key);
+            alert("Clave guardada.");
         }
 
-        // 2. Toggle Experiencia
         function toggleExperience() {
-            const checkbox = document.getElementById('noExpCheckbox');
-            const textarea = document.getElementById('experience');
-            const message = document.getElementById('noExpMessage');
-
-            if (checkbox.checked) {
-                textarea.classList.add('hidden');
-                message.classList.remove('hidden');
-            } else {
-                textarea.classList.remove('hidden');
-                message.classList.add('hidden');
-            }
+            const isChecked = document.getElementById('noExpCheckbox').checked;
+            document.getElementById('experience').classList.toggle('hidden', isChecked);
+            document.getElementById('noExpMessage').classList.toggle('hidden', !isChecked);
         }
 
-        function editData() {
-            document.getElementById('cv-result').classList.add('hidden');
-            document.getElementById('form-container').style.display = 'block';
-            window.scrollTo(0, 0);
-        }
-
-        // 3. Generación con IA
         async function generateCV() {
             const key = apiKeyInput.value.trim();
-            if(!key) return alert("Falta la API Key de Google. Configúrala arriba.");
+            if(!key) return alert("Necesitas la API Key de Groq (Es gratis en console.groq.com)");
 
-            // UI
+            // UI Loading
             const btn = document.getElementById('btn-generate');
             const status = document.getElementById('status-msg');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PENSANDO...';
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> GENERANDO...';
             status.classList.remove('hidden');
 
             // Datos
-            const noExperience = document.getElementById('noExpCheckbox').checked;
+            const noExp = document.getElementById('noExpCheckbox').checked;
             const data = {
                 name: document.getElementById('name').value,
                 target: document.getElementById('targetJob').value,
@@ -178,125 +163,95 @@
                 experience: document.getElementById('experience').value
             };
 
-            // Prompt condicional
-            let promptContext = "";
-            if (noExperience) {
-                promptContext = `
-                    EL CANDIDATO NO TIENE EXPERIENCIA LABORAL.
-                    En lugar de inventar experiencia, genera un campo llamado "motivation_text".
-                    Este texto debe ser un párrafo profesional y persuasivo (aprox 50-80 palabras) explicando por qué es el candidato ideal basándose en su formación, sus ganas de aprender y sus soft skills (responsabilidad, trabajo en equipo, rapidez).
-                    Deja el array "experience" vacío.
-                `;
-            } else {
-                promptContext = `
-                    EL CANDIDATO TIENE EXPERIENCIA.
-                    Mejora la redacción de la experiencia proporcionada: "${data.experience}".
-                    Convierte las descripciones en bullet points de logros y acciones.
-                    El campo "motivation_text" debe ir vacío o null.
-                `;
-            }
+            // Prompt diseñado para Llama 3 (JSON Mode)
+            const systemPrompt = `Eres un experto en CVs y ATS. Tu salida debe ser SIEMPRE un JSON válido, sin texto antes ni después.
+            Estructura JSON requerida:
+            {
+                "summary": "string",
+                "skills": ["string"],
+                "education": [{"title": "string", "center": "string", "year": "string"}],
+                "courses": ["string"],
+                "experience": [{"role": "string", "company": "string", "dates": "string", "bullets": ["string"]}],
+                "motivation": "string (solo si no hay experiencia, sino null)"
+            }`;
 
-            const fullPrompt = `
-                Eres un experto redactor de CVs.
-                Objetivo: Crear un JSON para un CV de "${data.target}".
-                
-                ${promptContext}
-                
-                Datos del candidato:
-                - Nombre: ${data.name}
-                - Educación Formal: ${data.education}
-                - Cursos/Certificados: ${data.courses}
-                
-                INSTRUCCIONES DE FORMATO:
-                1. Analiza keywords del puesto "${data.target}" y úsalas en el "summary" y las "skills".
-                2. Separa claramente "education" (títulos oficiales) de "certificates" (cursos extra).
-                3. Devuelve SOLAMENTE un JSON válido con esta estructura:
-                {
-                    "summary": "Perfil profesional corto (2-3 frases) enfocado al puesto.",
-                    "skills": ["skill1", "skill2", "skill3", "skill4", "skill5"],
-                    "education": [{"title": "Título", "institution": "Centro", "year": "Año"}],
-                    "certificates": [{"title": "Nombre Curso", "issuer": "Plataforma/Centro"}],
-                    "experience": [{"role": "Puesto", "company": "Empresa", "dates": "Fechas", "bullets": ["logro 1", "logro 2"]}],
-                    "motivation_text": "Texto de motivación si no hay experiencia, o null si la hay."
-                }
+            const userPrompt = `
+            Crea un perfil para el puesto: ${data.target}.
+            Candidato: ${data.name}
+            Educación: ${data.education}
+            Cursos: ${data.courses}
+            
+            ${noExp 
+                ? "EL CANDIDATO NO TIENE EXPERIENCIA. Genera un campo 'motivation' persuasivo y deja 'experience' vacío." 
+                : `EXPERIENCIA A MEJORAR: ${data.experience}. Genera 'experience' con logros y verbos de acción. 'motivation' debe ser null.`
+            }
             `;
 
             try {
-                // Usamos gemini-1.5-flash estándar
-                   const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${key}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${key}`,
+                        "Content-Type": "application/json"
+                    },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: fullPrompt }] }]
+                        model: "llama3-70b-8192", // Modelo muy potente y gratis
+                        messages: [
+                            { role: "system", content: systemPrompt },
+                            { role: "user", content: userPrompt }
+                        ],
+                        temperature: 0.5,
+                        response_format: { type: "json_object" } // Forzar JSON
                     })
                 });
 
-                if (!response.ok) throw new Error(`Error API: ${response.status}`);
-                const result = await response.json();
-                
-                let textRaw = result.candidates[0].content.parts[0].text;
-                // Limpieza agresiva de markdown json
-                textRaw = textRaw.replace(/```json/g, '').replace(/```/g, '').trim();
-                
-                const aiData = JSON.parse(textRaw);
-                renderCV(data, aiData, noExperience);
+                if(!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error?.message || "Error en la API");
+                }
 
-            } catch (error) {
-                console.error(error);
-                alert("Error: " + error.message + ". \n\nSi dice 'Not Found', verifica tu API Key o intenta regenerar una nueva en Google AI Studio.");
+                const result = await response.json();
+                const content = JSON.parse(result.choices[0].message.content);
+                
+                renderCV(data, content, noExp);
+
+            } catch (e) {
+                alert("Error: " + e.message);
+                console.error(e);
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-magic"></i> GENERAR CV OPTIMIZADO';
+                btn.innerHTML = '<i class="fas fa-magic text-orange-500"></i> GENERAR CV';
                 status.classList.add('hidden');
             }
         }
 
-        // 4. Renderizado
-        function renderCV(userData, aiData, isJunior) {
+        function renderCV(user, ai, isJunior) {
             const container = document.getElementById('cv-preview');
             
-            // HTML Componentes
-            const skillsHTML = aiData.skills.map(s => `<span class="bg-gray-200 px-2 py-1 rounded text-xs font-bold mr-2 mb-2 inline-block">${s}</span>`).join('');
+            // Helpers HTML
+            const skillsHTML = (ai.skills || []).map(s => `<span class="inline-block bg-gray-800 text-white text-xs px-2 py-1 rounded mr-1 mb-1">${s}</span>`).join('');
             
-            const eduHTML = aiData.education.length > 0 ? aiData.education.map(e => `
-                <div class="mb-2">
-                    <div class="font-bold text-slate-800">${e.title}</div>
-                    <div class="text-sm text-slate-600">${e.institution} | ${e.year}</div>
-                </div>
-            `).join('') : '<p class="text-sm text-gray-400">Sin educación formal listada.</p>';
-
-            const certHTML = aiData.certificates && aiData.certificates.length > 0 ? `
-                <div class="mb-6">
-                    <h3 class="text-md font-bold uppercase border-b-2 border-slate-300 mb-3 text-slate-700 tracking-wider">Cursos y Certificaciones</h3>
-                    ${aiData.certificates.map(c => `<li class="text-sm mb-1 list-disc ml-4">${c.title} <span class="text-slate-500 text-xs">(${c.issuer})</span></li>`).join('')}
-                </div>
-            ` : '';
-
-            let mainSectionHTML = '';
-
-            if (isJunior && aiData.motivation_text) {
-                // Renderizar Motivación en lugar de Experiencia
-                mainSectionHTML = `
+            let mainBody = '';
+            
+            if(isJunior && ai.motivation) {
+                mainBody = `
                     <div class="mb-6">
-                        <h3 class="text-md font-bold uppercase border-b-2 border-slate-300 mb-3 text-slate-700 tracking-wider">Objetivo Profesional</h3>
-                        <div class="bg-slate-50 p-4 rounded border-l-4 border-blue-500 italic text-slate-700 text-sm leading-relaxed">
-                            "${aiData.motivation_text}"
-                        </div>
+                        <h3 class="text-lg font-bold uppercase border-b-2 border-gray-800 mb-3 tracking-wider">Objetivo Profesional</h3>
+                        <p class="text-sm leading-relaxed italic text-gray-700 bg-gray-50 p-4 border-l-4 border-gray-800">"${ai.motivation}"</p>
                     </div>
                 `;
-            } else if (aiData.experience && aiData.experience.length > 0) {
-                // Renderizar Experiencia Normal
-                mainSectionHTML = `
+            } else if (ai.experience && ai.experience.length > 0) {
+                mainBody = `
                     <div class="mb-6">
-                        <h3 class="text-md font-bold uppercase border-b-2 border-slate-300 mb-3 text-slate-700 tracking-wider">Experiencia Profesional</h3>
-                        ${aiData.experience.map(job => `
-                            <div class="mb-4">
-                                <div class="flex justify-between items-baseline">
-                                    <span class="font-bold text-slate-900">${job.role}</span>
-                                    <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded">${job.dates}</span>
+                        <h3 class="text-lg font-bold uppercase border-b-2 border-gray-800 mb-3 tracking-wider">Experiencia</h3>
+                        ${ai.experience.map(job => `
+                            <div class="mb-4 break-inside-avoid">
+                                <div class="flex justify-between font-bold text-gray-900">
+                                    <span>${job.role}</span>
+                                    <span class="text-sm font-normal text-gray-600">${job.dates}</span>
                                 </div>
-                                <div class="text-sm text-blue-700 font-semibold mb-1">${job.company}</div>
-                                <ul class="list-disc ml-5 text-sm text-slate-700 space-y-1">
+                                <div class="text-sm text-gray-700 font-semibold mb-1">${job.company}</div>
+                                <ul class="list-disc ml-5 text-sm text-gray-600 space-y-1">
                                     ${job.bullets.map(b => `<li>${b}</li>`).join('')}
                                 </ul>
                             </div>
@@ -305,41 +260,54 @@
                 `;
             }
 
-            // Montaje Final
+            const eduHTML = (ai.education || []).map(e => `
+                <div class="mb-2">
+                    <div class="font-bold text-sm">${e.title}</div>
+                    <div class="text-xs text-gray-600">${e.center} | ${e.year}</div>
+                </div>
+            `).join('');
+
+            const courseHTML = (ai.courses || []).map(c => `<li class="text-sm text-gray-600">${c}</li>`).join('');
+
             container.innerHTML = `
-                <!-- Header -->
-                <div class="text-center mb-8">
-                    <h1 class="text-4xl font-extrabold uppercase tracking-tight text-slate-900 mb-2">${userData.name}</h1>
-                    <p class="text-lg text-blue-700 font-medium mb-4 tracking-wide">${userData.target}</p>
-                    <div class="text-sm text-slate-600 flex justify-center gap-4 flex-wrap">
-                        <span><i class="fas fa-envelope text-slate-400"></i> ${userData.email}</span>
-                        <span><i class="fas fa-phone text-slate-400"></i> ${userData.phone}</span>
-                        ${userData.linkedin ? `<span><i class="fab fa-linkedin text-slate-400"></i> ${userData.linkedin}</span>` : ''}
+                <div class="text-center border-b-4 border-gray-900 pb-6 mb-8">
+                    <h1 class="text-4xl font-black uppercase tracking-wide text-gray-900">${user.name}</h1>
+                    <h2 class="text-xl font-medium text-gray-600 mt-1">${user.target}</h2>
+                    <div class="mt-3 text-sm text-gray-500 flex justify-center gap-4 flex-wrap font-mono">
+                        <span>${user.email}</span>
+                        <span>${user.phone}</span>
+                        ${user.linkedin ? `<span>${user.linkedin}</span>` : ''}
                     </div>
                 </div>
 
-                <!-- Perfil -->
-                <div class="mb-6">
-                    <h3 class="text-md font-bold uppercase border-b-2 border-slate-300 mb-3 text-slate-700 tracking-wider">Perfil</h3>
-                    <p class="text-sm text-justify leading-relaxed text-slate-700">${aiData.summary}</p>
-                </div>
-
-                <!-- Skills -->
-                <div class="mb-6">
-                    <h3 class="text-md font-bold uppercase border-b-2 border-slate-300 mb-3 text-slate-700 tracking-wider">Competencias Clave</h3>
-                    <div>${skillsHTML}</div>
-                </div>
-
-                <!-- Sección Variable (Experiencia o Motivación) -->
-                ${mainSectionHTML}
-
-                <!-- Educación y Cursos -->
-                <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
-                    <div>
-                        <h3 class="text-md font-bold uppercase border-b-2 border-slate-300 mb-3 text-slate-700 tracking-wider">Educación</h3>
-                        ${eduHTML}
+                <div class="grid grid-cols-3 gap-8">
+                    <!-- COLUMNA IZQUIERDA (PRINCIPAL) -->
+                    <div class="col-span-2">
+                        <div class="mb-6">
+                            <h3 class="text-lg font-bold uppercase border-b-2 border-gray-800 mb-3 tracking-wider">Perfil</h3>
+                            <p class="text-sm text-justify text-gray-700 leading-relaxed">${ai.summary}</p>
+                        </div>
+                        ${mainBody}
                     </div>
-                    ${certHTML}
+
+                    <!-- COLUMNA DERECHA (SIDEBAR) -->
+                    <div class="col-span-1 bg-gray-50 p-4 rounded-lg h-fit">
+                        <div class="mb-6">
+                            <h3 class="text-md font-bold uppercase border-b border-gray-400 mb-3">Skills</h3>
+                            <div>${skillsHTML}</div>
+                        </div>
+
+                        <div class="mb-6">
+                            <h3 class="text-md font-bold uppercase border-b border-gray-400 mb-3">Educación</h3>
+                            ${eduHTML || '<span class="text-xs text-gray-400">No especificada</span>'}
+                        </div>
+
+                        ${(ai.courses && ai.courses.length > 0) ? `
+                        <div>
+                            <h3 class="text-md font-bold uppercase border-b border-gray-400 mb-3">Cursos</h3>
+                            <ul class="list-disc ml-4 space-y-1">${courseHTML}</ul>
+                        </div>` : ''}
+                    </div>
                 </div>
             `;
 
