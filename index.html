@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV Estilo Ejecutivo</title>
+    <title>CV Ejecutivo Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Fuente Serif elegante para parecerse a la imagen (Merriweather) -->
+    <!-- Fuentes elegantes -->
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
@@ -14,8 +14,8 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        serif: ['Merriweather', 'serif'], // Para títulos
-                        sans: ['Open Sans', 'sans-serif'], // Para cuerpo
+                        serif: ['Merriweather', 'serif'],
+                        sans: ['Open Sans', 'sans-serif'],
                     }
                 }
             }
@@ -23,149 +23,180 @@
     </script>
 
     <style>
-        /* Estilos exactos para impresión */
+        /* TRUCO PARA ELIMINAR ENCABEZADOS AUTOMÁTICOS DEL NAVEGADOR */
+        @page {
+            margin: 0; /* Esto elimina fecha, url y título al imprimir */
+            size: A4;
+        }
+
         @media print {
             body * { visibility: hidden; }
             #cv-preview, #cv-preview * { visibility: visible; }
-            #cv-preview { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
+            #cv-preview { 
+                position: absolute; 
+                left: 0; 
+                top: 0; 
+                width: 100%; 
+                margin: 0; 
+                padding: 0; 
+            }
             .no-print { display: none !important; }
-            .page-cv { box-shadow: none !important; margin: 0 !important; width: 100% !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-            /* Forzar márgenes de papel A4 */
-            @page { margin: 1cm; size: A4; }
+            /* Aseguramos fondo blanco y texto negro puro */
+            .page-cv { 
+                box-shadow: none !important; 
+                width: 210mm !important; 
+                height: 297mm !important; /* Forzar altura A4 exacta */
+                margin: 0 !important; 
+                print-color-adjust: exact; 
+                -webkit-print-color-adjust: exact; 
+                overflow: hidden; /* Evitar que se desborde a pag 2 si sobra un pixel */
+            }
         }
 
+        /* Estilos Pantalla */
+        body { background-color: #e5e7eb; }
+        
         .page-cv { 
-            max-width: 21cm; 
-            min-height: 29.7cm; 
+            width: 210mm; 
+            min-height: 297mm; 
             background: white; 
             margin: 2rem auto; 
-            color: #333;
-            padding: 2.5cm; /* Márgenes internos como en la foto */
+            color: #1a1a1a;
+            /* Márgenes internos reducidos para que quepa más info */
+            padding: 1.5cm 2cm; 
+            position: relative;
         }
 
-        /* Clases personalizadas para imitar el diseño */
-        .cv-header-line { border-top: 1px solid #666; margin-top: 5px; margin-bottom: 20px; }
+        /* Títulos de Sección Estilo Harvard */
         .cv-section-title { 
             font-family: 'Merriweather', serif;
             text-transform: uppercase;
             text-align: center;
-            font-size: 1.1rem;
-            letter-spacing: 1px;
+            font-size: 1rem; /* Un poco más pequeño para ahorrar espacio */
+            letter-spacing: 1.5px;
             color: #2d2d2d;
-            margin-top: 25px;
+            margin-top: 20px; /* Menos margen arriba */
             margin-bottom: 10px;
-            position: relative;
             font-weight: 700;
+            border-bottom: 1px solid #999;
+            padding-bottom: 4px;
         }
-        /* Línea debajo del título sección */
-        .cv-section-title::after {
-            content: "";
-            display: block;
-            width: 100%;
-            height: 1px;
-            background: #999;
-            margin-top: 5px;
-        }
-        
-        .dot-filled { color: #333; }
-        .dot-empty { color: #ddd; }
     </style>
 </head>
-<body class="bg-gray-200 font-sans text-gray-800">
+<body>
 
-    <!-- BARRA SUPERIOR (NO IMPRIMIR) -->
+    <!-- BARRA CONFIGURACIÓN -->
     <div class="bg-slate-900 text-white p-4 sticky top-0 z-50 no-print shadow-lg">
         <div class="max-w-5xl mx-auto flex justify-between items-center flex-wrap gap-3">
             <div class="flex items-center gap-2">
-                <i class="fas fa-file-signature text-white text-xl"></i>
-                <span class="font-bold text-lg">CV Executive</span>
+                <i class="fas fa-user-tie text-yellow-500 text-xl"></i>
+                <span class="font-bold text-lg">CV Builder V2</span>
             </div>
             <div class="flex gap-2 w-full sm:w-auto">
                 <input type="password" id="apiKey" placeholder="API Key de GROQ" class="text-black text-sm p-2 rounded w-full sm:w-64 outline-none">
-                <button onclick="saveKey()" class="bg-white text-black hover:bg-gray-200 px-4 py-2 rounded text-sm font-bold transition">Guardar Key</button>
+                <button onclick="saveKey()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-bold transition">Guardar Key</button>
             </div>
         </div>
     </div>
 
     <div class="max-w-5xl mx-auto p-4">
         
-        <!-- FORMULARIO DE DATOS -->
-        <div id="form-container" class="bg-white rounded-xl shadow-xl p-8 mb-8 no-print border border-gray-300">
-            <h2 class="text-2xl font-serif font-bold mb-6 text-slate-800 border-b pb-2">Datos del Candidato</h2>
+        <!-- FORMULARIO -->
+        <div id="form-container" class="bg-white rounded-xl shadow-xl p-6 md:p-8 mb-8 no-print border-t-4 border-slate-800">
+            <h2 class="text-2xl font-serif font-bold mb-6 text-slate-800">Datos del Currículum</h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <!-- Fila 1 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
                 <div><label class="font-bold text-xs uppercase text-gray-500">Nombre Completo</label>
-                <input type="text" id="name" class="w-full border p-2 rounded" placeholder="Carlos Guzmán"></div>
+                <input type="text" id="name" class="w-full border border-gray-300 p-2 rounded focus:border-slate-800 outline-none" placeholder="Ej: Elías Díaz"></div>
                 <div><label class="font-bold text-xs uppercase text-blue-600">Puesto Objetivo</label>
-                <input type="text" id="targetJob" class="w-full border border-blue-300 bg-blue-50 p-2 rounded font-semibold" placeholder="Ingeniero de Procesos"></div>
+                <input type="text" id="targetJob" class="w-full border border-blue-300 bg-blue-50 p-2 rounded font-semibold outline-none" placeholder="Ej: Ingeniero Informático"></div>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div><label class="font-bold text-xs uppercase text-gray-500">Email</label><input type="email" id="email" class="w-full border p-2 rounded"></div>
-                <div><label class="font-bold text-xs uppercase text-gray-500">Teléfono</label><input type="tel" id="phone" class="w-full border p-2 rounded"></div>
-                <div><label class="font-bold text-xs uppercase text-gray-500">Ubicación / LinkedIn</label><input type="text" id="location" class="w-full border p-2 rounded" placeholder="Madrid, España | linkedin.com/in/..."></div>
+            <!-- Fila 2 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-4">
+                <div><label class="font-bold text-xs uppercase text-gray-500">Email</label><input type="email" id="email" class="w-full border border-gray-300 p-2 rounded"></div>
+                <div><label class="font-bold text-xs uppercase text-gray-500">Teléfono</label><input type="tel" id="phone" class="w-full border border-gray-300 p-2 rounded"></div>
+                <div><label class="font-bold text-xs uppercase text-gray-500">Ubicación / Web</label><input type="text" id="location" class="w-full border border-gray-300 p-2 rounded" placeholder="Madrid | linkedin.com/in/..."></div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <!-- Fila 3: Inputs Flexibles -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
                 <div>
                     <label class="font-bold text-xs uppercase text-gray-500">Educación</label>
-                    <textarea id="education" class="w-full border p-2 rounded h-24 text-sm" placeholder="Máster en Ingeniería Química, UPM, 2012..."></textarea>
+                    <textarea id="education" class="w-full border border-gray-300 p-2 rounded h-20 text-sm" placeholder="Máster, Universidad, Año..."></textarea>
                 </div>
                 <div>
-                    <label class="font-bold text-xs uppercase text-gray-500">Idiomas</label>
-                    <textarea id="languages" class="w-full border p-2 rounded h-24 text-sm" placeholder="Español Nativo, Inglés Alto..."></textarea>
+                    <label class="font-bold text-xs uppercase text-green-600">Fortalezas / Habilidades</label>
+                    <textarea id="customSkills" class="w-full border border-green-300 bg-green-50 p-2 rounded h-20 text-sm" placeholder="Opcional: Escribe tus skills (Java, Liderazgo...) o déjalo vacío para que la IA las deduzca."></textarea>
                 </div>
             </div>
+            
+            <!-- Idiomas -->
+             <div class="mb-4">
+                <label class="font-bold text-xs uppercase text-gray-500">Idiomas</label>
+                <input type="text" id="languages" class="w-full border border-gray-300 p-2 rounded" placeholder="Español Nativo, Inglés B2...">
+            </div>
 
-            <div class="mb-6">
-                <div class="flex justify-between items-center mb-1">
-                    <label class="font-bold text-xs uppercase text-gray-500">Experiencia Laboral</label>
-                    <label class="flex items-center gap-2 cursor-pointer bg-gray-100 px-2 py-1 rounded">
-                        <input type="checkbox" id="noExpCheckbox" onchange="toggleExp()" class="w-4 h-4"> <span class="text-xs">Sin experiencia</span>
+            <!-- Experiencia -->
+            <div class="mb-6 bg-gray-50 p-4 rounded border border-gray-200">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="font-bold text-xs uppercase text-gray-700">Experiencia Laboral</label>
+                    <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-1 rounded shadow-sm">
+                        <input type="checkbox" id="noExpCheckbox" onchange="toggleExp()" class="w-4 h-4 accent-slate-800"> 
+                        <span class="text-xs font-bold text-slate-600">No tengo experiencia</span>
                     </label>
                 </div>
-                <textarea id="experience" class="w-full border p-2 rounded h-32 text-sm" placeholder="Pega aquí tu experiencia desordenada..."></textarea>
-                <div id="noExpMsg" class="hidden text-xs text-blue-600 mt-1 bg-blue-50 p-2 rounded">Modo Junior activado: La IA creará fortalezas basadas en tu educación.</div>
+                <textarea id="experience" class="w-full border border-gray-300 p-2 rounded h-28 text-sm" placeholder="Puesto, Empresa, Fechas y tareas..."></textarea>
+                <div id="noExpMsg" class="hidden text-xs text-slate-500 mt-1 italic">
+                    <i class="fas fa-info-circle"></i> Se ocultará la sección de experiencia y se potenciará el perfil y la educación.
+                </div>
             </div>
 
-            <button onclick="generateCV()" id="btn-generate" class="w-full bg-slate-800 hover:bg-black text-white font-bold py-3 rounded shadow transition">
-                <i class="fas fa-magic text-yellow-400 mr-2"></i> GENERAR CV EJECUTIVO
+            <button onclick="generateCV()" id="btn-generate" class="w-full bg-slate-800 hover:bg-black text-white font-bold py-4 rounded shadow-lg transition flex justify-center gap-2 items-center">
+                <i class="fas fa-magic text-yellow-400"></i> GENERAR CV
             </button>
         </div>
 
-        <!-- VISTA PREVIA DEL CV -->
+        <!-- VISTA PREVIA -->
         <div id="cv-result" class="hidden">
-            <div class="flex justify-end gap-3 mb-4 no-print">
-                <button onclick="document.getElementById('form-container').style.display='block'; window.scrollTo(0,0);" class="text-gray-600 hover:text-black text-sm underline">Editar Datos</button>
-                <button onclick="window.print()" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 font-bold"><i class="fas fa-print mr-2"></i>Imprimir / PDF</button>
+            <div class="flex justify-between items-center mb-4 no-print bg-white p-3 rounded shadow">
+                <span class="text-sm text-gray-500 font-bold">Vista Previa A4</span>
+                <div class="flex gap-3">
+                    <button onclick="document.getElementById('form-container').style.display='block'; window.scrollTo(0,0);" class="text-blue-600 hover:underline text-sm font-bold">Editar</button>
+                    <button onclick="window.print()" class="bg-slate-800 text-white px-5 py-2 rounded font-bold hover:bg-slate-900 transition"><i class="fas fa-print mr-2"></i>Imprimir PDF</button>
+                </div>
             </div>
 
-            <!-- EL DOCUMENTO (A4) -->
-            <div id="cv-preview" class="page-cv shadow-2xl text-sm leading-normal">
-                <!-- SE LLENA CON JAVASCRIPT -->
+            <!-- HOJA A4 -->
+            <div id="cv-preview" class="page-cv shadow-2xl">
+                <!-- CONTENIDO JS -->
             </div>
         </div>
     </div>
 
     <script>
-        // 1. Configuración Inicial
+        // --- CONFIGURACIÓN ---
         const apiKeyInput = document.getElementById('apiKey');
         window.onload = () => { if(localStorage.getItem('groq_key')) apiKeyInput.value = localStorage.getItem('groq_key'); }
         function saveKey() { localStorage.setItem('groq_key', apiKeyInput.value); alert('Guardada'); }
+        
         function toggleExp() { 
             const chk = document.getElementById('noExpCheckbox').checked;
             document.getElementById('experience').classList.toggle('hidden', chk);
             document.getElementById('noExpMsg').classList.toggle('hidden', !chk);
         }
 
-        // 2. Función Generar
+        // --- GENERAR CV ---
         async function generateCV() {
             const key = apiKeyInput.value.trim();
-            if(!key.startsWith('gsk_')) return alert("Introduce una API Key de Groq válida.");
+            if(!key.startsWith('gsk_')) return alert("Clave Groq incorrecta. Debe empezar por gsk_");
 
             const btn = document.getElementById('btn-generate');
-            btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> REDACTANDO...';
+            btn.disabled = true; 
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> TRABAJANDO...';
 
+            const isJunior = document.getElementById('noExpCheckbox').checked;
             const data = {
                 name: document.getElementById('name').value,
                 target: document.getElementById('targetJob').value,
@@ -174,39 +205,42 @@
                 location: document.getElementById('location').value,
                 education: document.getElementById('education').value,
                 languages: document.getElementById('languages').value,
+                customSkills: document.getElementById('customSkills').value,
                 experience: document.getElementById('experience').value,
-                isJunior: document.getElementById('noExpCheckbox').checked
+                isJunior: isJunior
             };
 
-            // Prompt adaptado para devolver FORTALEZAS e IDIOMAS como la imagen
+            // PROMPT MEJORADO PARA EVITAR ALUCINACIONES
             const systemPrompt = `
-                Eres un experto en redacción de CVs ejecutivos. Devuelve SOLO un JSON válido.
-                Estructura requerida:
+                Eres un experto en CVs. Devuelve SOLO JSON.
+                Reglas:
+                1. Si "isJunior" es true, el array "experience" DEBE estar vacío [].
+                2. Si "customSkills" tiene texto, ÚSALO para generar "strengths" y "skills_list".
+                3. Genera descripciones breves y directas para que todo quepa en una página.
+                
+                Estructura JSON:
                 {
-                    "profile": "Resumen profesional justificado (3-4 líneas).",
+                    "profile": "Resumen perfil (max 350 caracteres)",
                     "experience": [
-                        {"company": "Empresa", "location": "Ciudad, País", "role": "Puesto", "dates": "20XX - 20XX", "bullets": ["logro 1", "logro 2"]}
+                        {"company": "Empresa", "location": "Ciudad", "role": "Puesto", "dates": "Años", "bullets": ["logro1", "logro2"]}
                     ],
                     "education": [
-                        {"institution": "Universidad", "location": "Ciudad", "degree": "Título", "dates": "Año"}
+                        {"institution": "Centro", "location": "Ciudad", "degree": "Título", "dates": "Año"}
                     ],
                     "strengths": [
-                        {"title": "Título (ej: Liderazgo)", "icon": "users (o similar)", "desc": "Breve descripción de 2 líneas."}
+                        {"title": "Nombre Fortaleza", "desc": "Descripción 1 línea"}
                     ],
-                    "languages": [
-                        {"language": "Idioma", "level": "Nivel (Texto)", "score": 1-5}
-                    ],
-                    "skills_list": ["skill1", "skill2", "skill3", "skill4", "skill5"]
+                    "languages": [{"language": "Idioma", "level": "Nivel"}],
+                    "skills_list": ["skill1", "skill2", "skill3", "skill4", "skill5", "skill6"]
                 }
-                Nota: Genera exactamente 3 'strengths' (Fortalezas) con descripciones detalladas.
             `;
 
             const userPrompt = `
-                Candidato: ${data.name}. Puesto: ${data.target}.
-                ${data.isJunior ? "Sin experiencia laboral (Enfócate en educación y potencial)." : `Experiencia: ${data.experience}`}
-                Educación: ${data.education}.
-                Idiomas: ${data.languages}.
-                Genera el contenido en Español formal.
+                Datos: ${JSON.stringify(data)}.
+                Instrucciones extra:
+                - Si el usuario dio 'customSkills', úsalas prioritariamente en 'strengths'. Si está vacío, infiérelas del puesto: ${data.target}.
+                - Genera exactamente 3 fortalezas (strengths).
+                - Idioma: Español Profesional.
             `;
 
             try {
@@ -214,7 +248,7 @@
                     method: "POST",
                     headers: { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        model: "llama-3.3-70b-versatile", // Modelo potente
+                        model: "llama-3.3-70b-versatile", 
                         messages: [{role: "system", content: systemPrompt}, {role: "user", content: userPrompt}],
                         response_format: { type: "json_object" }
                     })
@@ -222,133 +256,136 @@
 
                 const result = await response.json();
                 const aiData = JSON.parse(result.choices[0].message.content);
-                renderClassicCV(data, aiData);
+                
+                // Renderizar
+                renderCleanCV(data, aiData);
 
             } catch (e) {
                 alert("Error: " + e.message);
             } finally {
-                btn.disabled = false; btn.innerHTML = 'GENERAR CV EJECUTIVO';
+                btn.disabled = false; btn.innerHTML = '<i class="fas fa-magic text-yellow-400"></i> GENERAR CV';
             }
         }
 
-        // 3. Renderizado Estilo Clásico (Imitando la Imagen)
-        function renderClassicCV(user, ai) {
+        // --- RENDERIZADO (CONTROL TOTAL DEL DISEÑO) ---
+        function renderCleanCV(user, ai) {
             const container = document.getElementById('cv-preview');
             
-            // Función para los puntos de idioma
-            const renderDots = (score) => {
-                let html = '';
-                for(let i=1; i<=5; i++) {
-                    html += `<span class="${i <= score ? 'text-slate-800' : 'text-gray-300'} text-xs">●</span>`;
-                }
-                return html;
-            };
+            // Iconos fijos para fortalezas
+            const strIcons = ['fa-brain', 'fa-rocket', 'fa-users'];
 
-            // Iconos aleatorios fijos para Fortalezas (Para simular la imagen)
-            const icons = ['fa-users', 'fa-comments', 'fa-lightbulb'];
-
-            let expHTML = ai.experience.map(job => `
-                <div class="mb-5">
-                    <div class="flex justify-between items-baseline">
-                        <h3 class="font-serif text-lg font-bold text-gray-800">${job.company}</h3>
-                        <span class="text-gray-600 font-sans text-sm">${job.location || ''}</span>
+            // Lógica Experiencia: Si está vacía o es Junior, no se renderiza NADA
+            let expSectionHTML = '';
+            if (!user.isJunior && ai.experience && ai.experience.length > 0) {
+                const expItems = ai.experience.map(job => `
+                    <div class="mb-3">
+                        <div class="flex justify-between items-baseline">
+                            <h3 class="font-serif text-md font-bold text-slate-900">${job.company}</h3>
+                            <span class="text-slate-600 font-sans text-xs">${job.location || ''}</span>
+                        </div>
+                        <div class="flex justify-between items-baseline mb-1">
+                            <span class="italic text-slate-700 font-sans text-sm">${job.role}</span>
+                            <span class="text-slate-600 font-sans text-xs">${job.dates}</span>
+                        </div>
+                        <ul class="list-disc list-inside text-slate-700 text-xs space-y-0.5 text-justify ml-2">
+                            ${job.bullets.map(b => `<li>${b}</li>`).join('')}
+                        </ul>
                     </div>
-                    <div class="flex justify-between items-baseline mb-2">
-                        <span class="italic text-gray-700 font-sans">${job.role}</span>
-                        <span class="text-gray-600 font-sans text-sm">${job.dates}</span>
-                    </div>
-                    <ul class="list-disc list-inside text-gray-700 text-sm space-y-1 text-justify">
-                        ${job.bullets.map(b => `<li>${b}</li>`).join('')}
-                    </ul>
-                </div>
-            `).join('');
+                `).join('');
 
+                expSectionHTML = `
+                    <div class="mb-4">
+                        <h2 class="cv-section-title">Experiencia</h2>
+                        ${expItems}
+                    </div>
+                `;
+            }
+
+            // HTML Educación
             let eduHTML = ai.education.map(edu => `
-                <div class="mb-3">
-                    <div class="flex justify-between items-baseline">
-                        <h3 class="font-serif text-md font-bold text-gray-700">${edu.institution}</h3>
-                        <span class="text-gray-600 text-sm">${edu.location || ''}</span>
+                <div class="flex justify-between items-end mb-2 border-b border-dotted border-gray-300 pb-1">
+                    <div>
+                        <div class="font-serif font-bold text-slate-800 text-sm">${edu.institution}</div>
+                        <div class="text-slate-700 text-sm">${edu.degree}</div>
                     </div>
-                    <div class="flex justify-between items-baseline">
-                        <span class="text-gray-700">${edu.degree}</span>
-                        <span class="text-gray-600 text-sm">${edu.dates}</span>
+                    <div class="text-right">
+                        <div class="text-slate-600 text-xs">${edu.location || ''}</div>
+                        <div class="text-slate-600 text-xs font-bold">${edu.dates}</div>
                     </div>
                 </div>
             `).join('');
 
-            let strengthsHTML = ai.strengths.map((str, idx) => `
-                <div class="flex-1 p-2">
-                    <div class="flex items-center gap-2 mb-1 font-serif font-bold text-gray-700">
-                        <i class="fas ${icons[idx] || 'fa-check'} text-gray-500"></i> ${str.title}
+            // HTML Fortalezas (Diseño Horizontal Compacto)
+            let strHTML = ai.strengths.map((s, i) => `
+                <div class="mb-2">
+                    <div class="flex items-center gap-2 font-bold text-slate-800 text-sm mb-0.5">
+                        <i class="fas ${strIcons[i] || 'fa-check'} text-slate-500 text-xs"></i> ${s.title}
                     </div>
-                    <p class="text-xs text-gray-600 text-justify leading-relaxed">${str.desc}</p>
+                    <p class="text-xs text-slate-600 leading-snug text-justify">${s.desc}</p>
                 </div>
             `).join('');
 
+            // HTML Idiomas (Puntos)
             let langHTML = ai.languages.map(l => `
-                <div class="flex justify-between items-center w-full md:w-1/2 pr-4 mb-1">
-                    <span class="text-sm font-semibold">${l.language} <span class="font-normal text-gray-500 text-xs ml-2">${l.level}</span></span>
-                    <div class="tracking-widest">${renderDots(l.score)}</div>
+                <div class="flex justify-between items-center text-sm mb-1">
+                    <span class="font-bold text-slate-700">${l.language} <span class="font-normal text-slate-500 text-xs">(${l.level})</span></span>
+                    <div class="flex gap-1 text-slate-800 text-[10px]">
+                        <i class="fas fa-circle"></i><i class="fas fa-circle"></i><i class="fas fa-circle"></i><i class="fas fa-circle"></i><i class="far fa-circle"></i>
+                    </div>
                 </div>
             `).join('');
 
-            // HTML FINAL
+            // MONTAJE FINAL (Ordernado para ocupar menos espacio vertical)
             container.innerHTML = `
-                <!-- HEADER -->
-                <div class="text-center mb-6">
-                    <h1 class="font-serif text-3xl font-bold uppercase text-gray-800 tracking-wider mb-1">${user.name}</h1>
-                    <p class="text-gray-600 text-md mb-1 tracking-wide">${user.target}</p>
-                    <p class="text-sm text-gray-500 font-sans">
-                        ${user.phone} • Email: ${user.email} • ${user.location}
-                    </p>
+                <!-- HEADER CENTRADO -->
+                <div class="text-center mb-5">
+                    <h1 class="font-serif text-3xl font-bold uppercase text-slate-900 tracking-widest mb-1">${user.name}</h1>
+                    <h2 class="text-slate-600 text-md font-medium tracking-wide uppercase mb-2">${user.target}</h2>
+                    <div class="text-xs text-slate-500 font-sans flex justify-center gap-3 items-center">
+                        <span>${user.phone}</span> • 
+                        <span>${user.email}</span> • 
+                        <span>${user.location}</span>
+                    </div>
                 </div>
 
                 <!-- PERFIL -->
-                <div class="mb-6">
-                    <h2 class="cv-section-title">Perfil Profesional</h2>
-                    <p class="text-sm text-gray-700 text-justify leading-relaxed font-sans">
+                <div class="mb-4">
+                    <h2 class="cv-section-title mt-0">Perfil Profesional</h2>
+                    <p class="text-sm text-slate-700 text-justify leading-relaxed font-sans">
                         ${ai.profile}
                     </p>
                 </div>
 
-                <!-- EXPERIENCIA -->
-                <div class="mb-6">
-                    <h2 class="cv-section-title">Experiencia</h2>
-                    ${expHTML}
-                </div>
+                <!-- SECCIÓN EXPERIENCIA (Oculta si es Junior) -->
+                ${expSectionHTML}
 
-                <!-- FORTALEZAS (3 COLUMNAS) -->
-                <div class="mb-6">
-                    <h2 class="cv-section-title">Fortalezas</h2>
-                    <div class="flex flex-col md:flex-row gap-4 mt-3">
-                        ${strengthsHTML}
+                <!-- COLUMNAS PARA OPTIMIZAR ESPACIO (Educación + Fortalezas) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-4">
+                    <div>
+                        <h2 class="cv-section-title mt-0">Educación</h2>
+                        ${eduHTML}
+                    </div>
+                    <div>
+                        <h2 class="cv-section-title mt-0">Fortalezas</h2>
+                        ${strHTML}
                     </div>
                 </div>
 
-                <!-- EDUCACIÓN -->
-                <div class="mb-6">
-                    <h2 class="cv-section-title">Educación</h2>
-                    ${eduHTML}
-                </div>
-
-                <!-- IDIOMAS -->
-                <div class="mb-6">
-                    <h2 class="cv-section-title">Idiomas</h2>
-                    <div class="flex flex-wrap mt-3">
+                <!-- COLUMNAS PIE (Idiomas + Skills) -->
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-gray-400 pt-3 mt-2">
+                    <div>
+                        <h3 class="font-serif font-bold uppercase text-xs text-slate-600 mb-2">Idiomas</h3>
                         ${langHTML}
                     </div>
-                </div>
-
-                <!-- HABILIDADES (PIE) -->
-                <div class="mt-8 pt-4 border-t border-gray-400 text-center">
-                    <h3 class="font-serif font-bold uppercase text-sm text-gray-600 mb-2">Habilidades</h3>
-                    <p class="text-sm text-gray-700">
-                        ${ai.skills_list.join(' • ')}
-                    </p>
+                    <div>
+                        <h3 class="font-serif font-bold uppercase text-xs text-slate-600 mb-2">Habilidades Técnicas</h3>
+                        <p class="text-xs text-slate-700 leading-relaxed">
+                            ${ai.skills_list.join(' • ')}
+                        </p>
+                    </div>
                 </div>
             `;
-            
-            // Mostrar
+
             document.getElementById('cv-result').classList.remove('hidden');
             document.getElementById('form-container').style.display = 'none';
             window.scrollTo(0,0);
